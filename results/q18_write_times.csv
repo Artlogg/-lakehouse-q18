@@ -1,0 +1,10 @@
+format,codec,table_name,execution_seconds
+PARQUET,ZSTD,customer,0.501
+PARQUET,ZSTD,orders,1.078
+PARQUET,ZSTD,lineitem,1.619
+PARQUET,GZIP,customer,2.441
+PARQUET,GZIP,orders,2.130
+PARQUET,GZIP,lineitem,2.370
+ORC,ZSTD,customer,0.772
+ORC,ZSTD,orders,1.034
+ORC,ZSTD,lineitem,1.920

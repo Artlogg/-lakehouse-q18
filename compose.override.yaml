@@ -1,0 +1,56 @@
+services:
+  lakekeeper-migrate:
+    image: quay.io/lakekeeper/catalog:latest-main@sha256:7da06a5cb6426a806ec132f09fae6c79aa546a4661ea8fa19b0dfb07709f5fc7
+    platform: linux/amd64
+    command: ["migrate"]
+    environment: &lakekeeper-env
+      LAKEKEEPER__PG_DATABASE_URL_READ: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      LAKEKEEPER__PG_DATABASE_URL_WRITE: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      LAKEKEEPER__PG_ENCRYPTION_KEY: ${LAKEKEEPER_ENCRYPTION_KEY:?Set encryption key}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    mem_limit: 512m
+  lakekeeper:
+    image: quay.io/lakekeeper/catalog:latest-main@sha256:7da06a5cb6426a806ec132f09fae6c79aa546a4661ea8fa19b0dfb07709f5fc7
+    platform: linux/amd64
+    command: ["serve"]
+    environment:
+      <<: *lakekeeper-env
+      LAKEKEEPER__AUTHZ_BACKEND: allowall
+      RUST_LOG: info
+    ports:
+      - "127.0.0.1:8181:8181"
+    depends_on:
+      lakekeeper-migrate:
+        condition: service_completed_successfully
+      silo:
+        condition: service_healthy
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD", "/home/nonroot/lakekeeper", "healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+  trino:
+    image: trinodb/trino:483@sha256:db58cc93e593a2706553745f276bb119c9810e69918be56ecde088ba7ccb0534
+    platform: linux/amd64
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+    volumes:
+      - ./trino/config.properties:/etc/trino/config.properties:ro
+      - ./trino/jvm.config:/etc/trino/jvm.config:ro
+      - ./trino/catalog:/etc/trino/catalog:ro
+      - ./sql:/sql:ro
+    depends_on:
+      lakekeeper:
+        condition: service_healthy
+    mem_limit: 4g
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/v1/status"]
+      interval: 10s
+      timeout: 5s
+      retries: 30

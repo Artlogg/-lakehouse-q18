@@ -1,0 +1,26 @@
+name: lakehouse-q18-bi
+services:
+  superset:
+    platform: linux/amd64
+    build:
+      context: ./bi
+    image: local/superset-trino:6.1.0
+    ports:
+      - "127.0.0.1:8088:8088"
+    env_file:
+      - .env.bi
+    environment:
+      SUPERSET_CONFIG_PATH: /app/pythonpath/superset_config.py
+    volumes:
+      - ./bi/superset_config.py:/app/pythonpath/superset_config.py:ro
+      - superset_data:/app/superset_home
+    networks:
+      - lakehouse
+    mem_limit: 1536m
+    command: ["gunicorn", "--bind", "0.0.0.0:8088", "--workers", "1", "--threads", "4", "--timeout", "120", "superset.app:create_app()"]
+volumes:
+  superset_data:
+networks:
+  lakehouse:
+    external: true
+    name: lakehouse-q18_default

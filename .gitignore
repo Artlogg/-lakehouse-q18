@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+!.env.bi.example
+*.bak*
+__pycache__/
+*.pyc
+*.vhdx
+*.db
+*.db-journal
+*.log
+.DS_Store

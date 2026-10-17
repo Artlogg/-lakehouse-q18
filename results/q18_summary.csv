@@ -1,0 +1,4 @@
+format,codec,bronze_size_mb,write_execution_sum_seconds,q18_execution_median_seconds,size_note
+PARQUET,ZSTD,22.177,3.198,1.150,sum of rounded table sizes
+PARQUET,GZIP,23.825,6.941,1.240,reported size
+ORC,ZSTD,26.930,3.726,0.976,reported size
