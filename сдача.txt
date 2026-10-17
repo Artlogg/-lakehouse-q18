@@ -1,4 +1,0 @@
-Кадыров Артур Рустамович
-Вариант 3 — TPC-H Q18 «Large Volume Customer»
-Репозиторий: https://github.com/Artlogg/-lakehouse-q18
-Отчёт: https://github.com/Artlogg/-lakehouse-q18/blob/main/отчет.md

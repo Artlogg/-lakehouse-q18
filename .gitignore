@@ -10,3 +10,4 @@ __pycache__/
 *.db-journal
 *.log
 .DS_Store
+/сдача.txt
